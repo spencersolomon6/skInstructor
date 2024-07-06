@@ -1,8 +1,14 @@
+import os.path
+
+import numpy as np
+
 from util.poseModule import PoseDetector
 import cv2
 import time
 import argparse
 import util.RNN
+import json
+from os import walk
 
 
 def main(args):
@@ -10,31 +16,23 @@ def main(args):
     train = args.train or False
     demo = args.demo or False
 
-    cap = cv2.VideoCapture('data/vid1.mp4')  # make VideoCapture(0) for webcam
-    cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Image", 1200, 1200)
-
     rnn = util.RNN.RNN(verbose=verbose)
-
-    pTime = 0
     detector = PoseDetector()
-    while True:
-        success, img = cap.read()
-        img = detector.findPose(img, False)
-        landmarks = detector.getPosition(img, False)
 
-        prediction = rnn.predict(landmarks)
+    if demo:
+        detector.displayVideo('data/training_videos/vid1.mp4')
 
-        print(prediction)
+    if train:
+        trainingDir = 'data/training_data'
+        dataFiles = next(walk(trainingDir), ([None, None, []]))[2]
 
-        cTime = time.time()
-        fps = 1 / (cTime - pTime)
-        pTime = cTime
-
-        if False:
-            cv2.putText(img, str(int(fps)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
-            cv2.imshow("Image", img)
-            cv2.waitKey(10000)
+        for filename in dataFiles:
+            batchedData = np.array([])
+            with open(os.path.join(trainingDir, filename)) as f:
+                data = json.load(f)
+                print(data.shape)
+                batchedData = np.append(batchedData, data)
+                print(batchedData)
 
 
 if __name__ == "__main__":

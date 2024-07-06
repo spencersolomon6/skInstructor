@@ -76,3 +76,23 @@ class PoseDetector:
 
         with open(landmarkFile, 'w') as output:
             json.dump(landmarks, output)
+
+
+    def displayVideo(self, videoFile):
+        cap = cv2.VideoCapture(videoFile)  # make VideoCapture(0) for webcam
+        cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Image", 1200, 1200)
+
+        pTime = 0
+        while True:
+            success, img = cap.read()
+            img = self.findPose(img, True)
+            landmarks = self.getPosition(img, True)
+
+            cTime = time.time()
+            fps = 1 / (cTime - pTime)
+            pTime = cTime
+
+            cv2.putText(img, str(int(fps)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
+            cv2.imshow("Image", img)
+            cv2.waitKey(10000)
