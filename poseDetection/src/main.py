@@ -3,10 +3,7 @@ import os.path
 import numpy as np
 
 from util.poseModule import PoseDetector
-import cv2
-import time
 import argparse
-import util.RNN
 import json
 from os import walk
 
@@ -16,7 +13,7 @@ def main(args):
     train = args.train or False
     demo = args.demo or False
 
-    rnn = util.RNN.RNN(verbose=verbose)
+    rnn = poseDetection.src.util.RNN.RNN(verbose=verbose)
     detector = PoseDetector()
 
     if demo:
